@@ -1,3 +1,26 @@
+Metadata-Version: 2.4
+Name: tsg-lib
+Version: 0.1.1
+Summary: A modular library for synthetic time series generation.
+Home-page: https://github.com/MSCA-DN-Digital-Finance/tsg
+Author: Mathis Jander
+Author-email: your.email@domain.com
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: numpy
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
 # tsg – Modular Time Series Generator Library
 
 **tsg** is a lightweight Python library for generating synthetic time series data using modular and composable generators.  
@@ -16,17 +39,12 @@ It is designed for research, simulation, and testing of sequential decision-maki
 
 ## 📦 Installation
 
+### 🔧 Option 1:
 
 Install through GitHub from any location:
 
 ```bash
 pip install git+https://github.com/MSCA-DN-Digital-Finance/tsg.git
-```
-
-Install through PyPi from any location:
-
-```bash
-pip install tsg-lib
 ```
 
 

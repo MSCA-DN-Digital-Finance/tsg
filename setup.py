@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='tsg',
+    name='tsg-lib',
     version='0.1.0',
     description='Modular Time Series Generator Library',
     authors=[

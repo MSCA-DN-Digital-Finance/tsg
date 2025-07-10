@@ -16,15 +16,15 @@ It is designed for research, simulation, and testing of sequential decision-maki
 
 ## 📦 Installation
 
-### 🔧 Option 1: Install Locally (Editable Mode)
+### 🔧 Option 1:
 
-Clone the repository and install in editable mode:
+Install through GitHub from any location:
 
 ```bash
-git clone https://github.com/your-username/tsg.git
-cd tsg
-pip install -e .
+pip install git+https://github.com/MSCA-DN-Digital-Finance/tsg.git
 ```
+
+
 ## 🛠️ Example Usage
 
 Here’s how to generate a noisy linear trend time series using `tsg`:

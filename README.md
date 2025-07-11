@@ -39,18 +39,18 @@ from tsg.generators import LinearTrendGenerator
 from tsg.modifiers import GaussianNoise
 
 # Create a linear trend generator (increasing by +1 each step)
-base_generator = LinearTrendGenerator(start_price=100, up=True)
+base_generator = LinearTrendGenerator(start_value=100, up=True)
 
 # Wrap it with Gaussian noise (mean=0, std=1)
 noisy_generator = GaussianNoise(base_generator, mu=0.0, sigma=1.0)
 
 # Generate a few data points
-prices = []
+values = []
 for _ in range(10):
-    price = noisy_generator.generate_price(None)
-    prices.append(price)
+    value = noisy_generator.generate_value(None)
+    values.append(value)
 
-print(prices)
+print(values)
 ```
 
 ## 🧠 API Overview
@@ -59,8 +59,8 @@ print(prices)
 
 | Class                    | Description                                              |
 |--------------------------|----------------------------------------------------------|
-| `LinearTrendGenerator`   | Linearly increases or decreases the price at each step   |
-| `ConstantGenerator`      | Returns a fixed price (e.g., simulates cash)             |
+| `LinearTrendGenerator`   | Linearly increases or decreases the value at each step   |
+| `ConstantGenerator`      | Returns a fixed value (e.g., simulates cash)             |
 | `PeriodicTrendGenerator` | Generates a sinusoidal time series with set amplitude and frequency |
 
 ### Modifier Wrappers (`tsg.modifiers`)
@@ -71,7 +71,7 @@ print(prices)
 
 All components implement the `BaseGenerator` interface with:
 
-- `generate_price(last_price)` – returns the next value in the sequence
+- `generate_value(last_value)` – returns the next value in the sequence
 - `reset()` – resets any internal state (optional for stateless generators)
 
 

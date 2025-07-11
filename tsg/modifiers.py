@@ -11,10 +11,10 @@ class GaussianNoise(BaseGenerator):
         self.mu = mu
         self.sigma = sigma
 
-    def generate_price(self, last_price):
-        base_price = self.generator.generate_price(last_price)
+    def generate_value(self, last_value):
+        base_value = self.generator.generate_value(last_value)
         noise = np.random.normal(self.mu, self.sigma)
-        return base_price + noise
+        return base_value + noise
 
     def reset(self):
         self.generator.reset()

@@ -4,8 +4,8 @@ from abc import ABC, abstractmethod
 # === Base Class ===
 class BaseGenerator(ABC):
     @abstractmethod
-    def generate_price(self, last_price):
-        """Generate the next price in the series."""
+    def generate_value(self, last_value):
+        """Generate the next value in the series."""
         pass
 
     def reset(self):
@@ -14,21 +14,21 @@ class BaseGenerator(ABC):
 
 # === Core Generators ===
 class LinearTrendGenerator(BaseGenerator):
-    def __init__(self, start_price=10.0, up=True):
-        self.initial_price = start_price
-        self.current_price = start_price
+    def __init__(self, start_value=10.0, up=True):
+        self.initial_value = start_value
+        self.current_value = start_value
         self.up = up
 
-    def generate_price(self, last_price=None):
-        self.current_price += 1 if self.up else -1
-        return self.current_price
+    def generate_value(self, last_value=None):
+        self.current_value += 1 if self.up else -1
+        return self.current_value
 
     def reset(self):
-        self.current_price = self.initial_price
+        self.current_value = self.initial_value
 
 class ConstantGenerator(BaseGenerator):
-    def generate_price(self, last_price):
-        return last_price  # Always constant
+    def generate_value(self, last_value):
+        return last_value  # Always constant
 
 class PeriodicTrendGenerator(BaseGenerator):
     def __init__(self, start=10.0, amplitude=1.0, frequency=1.0):
@@ -37,7 +37,7 @@ class PeriodicTrendGenerator(BaseGenerator):
         self.frequency = frequency
         self.t = 0
 
-    def generate_price(self, last_price=None):
+    def generate_value(self, last_value=None):
         value = self.amplitude * np.sin(self.frequency * self.t) + self.start
         self.t += 1
         return value

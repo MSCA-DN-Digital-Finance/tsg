@@ -57,11 +57,14 @@ print(values)
 
 ### Core Generators (`tsg.generators`)
 
-| Class                    | Description                                              |
-|--------------------------|----------------------------------------------------------|
-| `LinearTrendGenerator`   | Linearly increases or decreases the value at each step   |
-| `ConstantGenerator`      | Returns a fixed value (e.g., simulates cash)             |
-| `PeriodicTrendGenerator` | Generates a sinusoidal time series with set amplitude and frequency |
+| Class                    | Description                                              | Parameters                                                                 |
+|--------------------------|----------------------------------------------------------|----------------------------------------------------------------------------|
+| `LinearTrendGenerator`   | Linearly increases or decreases the value at each step   | `start_value`, `slope`                                                     |
+| `ConstantGenerator`      | Returns a fixed value (e.g., simulates cash)             | None (uses `last_value` passed to `generate_value`)                        |
+| `PeriodicTrendGenerator` | Generates a sinusoidal time series with set amplitude and frequency | `start_value`, `amplitude`, `frequency`                          |
+| `RandomWalkGenerator`    | Simulates Brownian motion: a drifting random walk with optional noise | `start_value`, `mu`, `sigma`                                      |
+| `OrnsteinUhlenbeckGenerator` | Simulates mean-reverting noise with drift toward a long-term mean | `mu`, `theta`, `sigma`, `dt`, `start_value`                    |
+
 
 ### Modifier Wrappers (`tsg.modifiers`)
 

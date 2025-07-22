@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: tsg-lib
-Version: 0.1.4
+Version: 0.1.6
 Summary: A modular library for synthetic time series generation.
 Author-email: Mathis Jander <mathis.jander@utwente.nl>, Jens Reil <jens.reil@bfh.ch>
 License: MIT
@@ -71,20 +71,31 @@ print(values)
 
 ### Core Generators (`tsg.generators`)
 
-| Class                    | Description                                              | Parameters                                                                 |
-|--------------------------|----------------------------------------------------------|----------------------------------------------------------------------------|
-| `LinearTrendGenerator`   | Linearly increases or decreases the value at each step   | `start_value`, `slope`                                                     |
-| `ConstantGenerator`      | Returns a fixed value (e.g., simulates cash)             | None (uses `last_value` passed to `generate_value`)                        |
-| `PeriodicTrendGenerator` | Generates a sinusoidal time series with set amplitude and frequency | `start_value`, `amplitude`, `frequency`                          |
-| `RandomWalkGenerator`    | Simulates Brownian motion: a drifting random walk with optional noise | `start_value`, `mu`, `sigma`                                      |
-| `OrnsteinUhlenbeckGenerator` | Simulates mean-reverting noise with drift toward a long-term mean | `mu`, `theta`, `sigma`, `dt`, `start_value`                    |
+| Class                        | Description                                                             | Parameters                                 |
+|-----------------------------|-------------------------------------------------------------------------|--------------------------------------------|
+| `LinearTrendGenerator`      | Linearly increases or decreases the value at each step                  | `start_value`, `slope`                     |
+| `ConstantGenerator`         | Returns a fixed value (e.g., simulates cash)                            | None (uses `last_value` in `generate_value`) |
+| `PeriodicTrendGenerator`    | Generates a sinusoidal time series with set amplitude and frequency     | `start_value`, `amplitude`, `frequency`    |
+| `RandomWalkGenerator`       | Simulates Brownian motion: a drifting random walk with optional noise   | `start_value`, `mu`, `sigma`               |
+| `OrnsteinUhlenbeckGenerator`| Simulates mean-reverting noise with drift toward a long-term mean       | `mu`, `theta`, `sigma`, `dt`, `start_value`|
 
+---
 
 ### Modifier Wrappers (`tsg.modifiers`)
 
-| Class          | Description                                                  |
-|----------------|--------------------------------------------------------------|
-| `GaussianNoise`| Adds Gaussian noise (`N(mu, sigma)`) to any base generator   |
+| Class           | Description                                                  | Parameters              |
+|-----------------|--------------------------------------------------------------|--------------------------|
+| `GaussianNoise` | Adds Gaussian noise (`N(mu, sigma)`) to any base generator   | `mu`, `sigma`            |
+
+---
+
+### Meta-Generators (`tsg.meta_generators`)
+
+| Class                   | Description                                                                 | Parameters                                           |
+|-------------------------|-----------------------------------------------------------------------------|------------------------------------------------------|
+| `RegimeSwitchGenerator` | Switches between generators at predefined time steps                        | `generators`, `switch_times`                         |
+| `MarkovSwitchGenerator` | Switches between generators using a Markov transition matrix                | `generators`, `transition_matrix`, `initial_state`   |
+
 
 All components implement the `BaseGenerator` interface with:
 

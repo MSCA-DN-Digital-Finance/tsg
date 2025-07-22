@@ -1,8 +1,10 @@
 README.md
 pyproject.toml
 tests/test_generators.py
+tests/test_meta_generators.py
 tsg/__init__.py
 tsg/generators.py
+tsg/meta_generators.py
 tsg/modifiers.py
 tsg_lib.egg-info/PKG-INFO
 tsg_lib.egg-info/SOURCES.txt

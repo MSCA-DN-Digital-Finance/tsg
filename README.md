@@ -39,10 +39,10 @@ from tsg.generators import LinearTrendGenerator
 from tsg.modifiers import GaussianNoise
 
 # Create a linear trend generator (increasing by +1 each step)
-base_generator = LinearTrendGenerator(start_value=100, up=True)
+linear_generator = LinearTrendGenerator(start_value=100, slope=1)
 
 # Wrap it with Gaussian noise (mean=0, std=1)
-noisy_generator = GaussianNoise(base_generator, mu=0.0, sigma=1.0)
+noisy_generator = GaussianNoise(linear_generator, mu=0.0, sigma=1.0)
 
 # Generate a few data points
 values = []
@@ -77,10 +77,13 @@ print(values)
 
 ### Meta-Generators (`tsg.meta_generators`)
 
-| Class                   | Description                                                                 | Parameters                                           |
-|-------------------------|-----------------------------------------------------------------------------|------------------------------------------------------|
-| `RegimeSwitchGenerator` | Switches between generators at predefined time steps                        | `generators`, `switch_times`                         |
-| `MarkovSwitchGenerator` | Switches between generators using a Markov transition matrix                | `generators`, `transition_matrix`, `initial_state`   |
+### Meta-Generators (`tsg.meta_generators`)
+
+| Class                   | Description                                                                 | Parameters                                                |
+|-------------------------|-----------------------------------------------------------------------------|-----------------------------------------------------------|
+| `RegimeSwitchGenerator` | Switches between generators at predefined time steps                        | `generator_classes`, `generator_params_list`, `switch_times` |
+| `MarkovSwitchGenerator` | Switches between generators using a Markov transition matrix                | `generator_classes`, `generator_params_list`, `transition_matrix`, `initial_state` |
+
 
 
 All components implement the `BaseGenerator` interface with:

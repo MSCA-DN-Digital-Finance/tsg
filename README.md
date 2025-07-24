@@ -77,8 +77,6 @@ print(values)
 
 ### Meta-Generators (`tsg.meta_generators`)
 
-### Meta-Generators (`tsg.meta_generators`)
-
 | Class                   | Description                                                                 | Parameters                                                |
 |-------------------------|-----------------------------------------------------------------------------|-----------------------------------------------------------|
 | `RegimeSwitchGenerator` | Switches between generators at predefined time steps                        | `generator_classes`, `generator_params_list`, `switch_times` |

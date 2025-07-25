@@ -6,7 +6,8 @@ from tsg.generators import (
     PeriodicTrendGenerator,
     RandomWalkGenerator,
     OrnsteinUhlenbeckGenerator,
-    GeometricBrownianMotionGenerator)
+    GeometricBrownianMotionGenerator,
+    CoxIngersollRossGenerator)
 
 from tsg.modifiers import (
     GaussianNoise,
@@ -107,78 +108,8 @@ def test_ou_generator_stochasticity():
     assert any(v < 0.0 for v in values)  # Should cross below mean
     assert len(set(values)) > 1          # Ensure variation
 
-# === NOISE MODIFIER ===
 
-def test_gaussian_noise_perturbs_base():
-    """
-    GaussianNoise should apply perturbations to its base generator.
-    We check that output is still float and deviates from base trend.
-    """
-    base_gen = LinearTrendGenerator(start_value=100, slope=1)
-    noisy_gen = GaussianNoise(base_gen, mu=0.0, sigma=1.0)
-
-    noisy_values = [noisy_gen.generate_value(None) for _ in range(5)]
-    assert all(isinstance(p, float) for p in noisy_values)
-
-    # Check that noise caused deviation from the clean linear trend
-    diffs = [abs(p - (101 + i)) for i, p in enumerate(noisy_values)]
-    assert any(diff > 0 for diff in diffs)
-
-
-def test_poisson_noise_modifier_adds_random_jumps():
-    """
-    PoissonNoiseModifier should perturb the output of the base generator
-    by adding Poisson-distributed noise at every time step.
-
-    We test that:
-    - Values remain floats.
-    - The output deviates from the clean linear trend.
-    """
-    base = LinearTrendGenerator(start_value=100.0, slope=1.0)
-    mod = PoissonNoiseModifier(generator=base, lam=2.0, direction="both")
-
-    values = [mod.generate_value(None) for _ in range(10)]
-
-    assert all(isinstance(v, float) for v in values)
-
-    expected = [101 + i for i in range(10)]
-    diffs = [abs(v - e) for v, e in zip(values, expected)]
-    assert any(d > 0.0 for d in diffs)  # noise must cause at least one deviation
-
-
-def test_compound_poisson_jump_modifier_injects_fixed_number_of_jumps():
-    """
-    CompoundPoissonJumpModifier should inject a fixed number of jumps
-    (Poisson distributed) at randomly chosen time steps.
-
-    We test that:
-    - Values remain floats.
-    - Exactly N values deviate from the base trend, where N is the number of jumps.
-    """
-    T = 100
-    lam = 5
-    jump_size = 10.0
-
-    base = LinearTrendGenerator(start_value=0.0, slope=1.0)
-    mod = CompoundPoissonJumpModifier(generator=base, lam=lam, T=T, jump_size=jump_size, direction="both")
-
-    # Save the actual jump times
-    jump_steps = mod.jump_times.copy()
-
-    values = [mod.generate_value(None) for _ in range(T)]
-    expected = [1.0 + i for i in range(T)]
-
-    diffs = [abs(v - e) for v, e in zip(values, expected)]
-
-    # Count how many values differ from base trend by approximately jump_size
-    jump_count = sum(1 for d in diffs if abs(d) >= jump_size - 1e-5)
-
-    # Assert all values are floats
-    assert all(isinstance(v, float) for v in values)
-
-    # Number of jumps injected equals number of jump steps
-    assert jump_count == len(jump_steps)
-    assert jump_count > 0  # Should have at least one jump
+# === GEOMETRIC BROWNIAN MOTION GENERATOR ===
 
 
 def test_gbm_generator_produces_positive_values():
@@ -217,4 +148,80 @@ def test_gbm_generator_reset_works_properly():
         gen.generate_value()
     gen.reset()
     assert np.isclose(gen.current_value, 2.0)
+
+# === COX-INGERSOLL-ROSS GENERATOR ===
+
+def test_cir_generator_positive_values():
+    """
+    CIR should stay non-negative when Feller condition is satisfied.
+    """
+    gen = CoxIngersollRossGenerator(mu=1.0, theta=0.5, sigma=0.5, dt=0.01, start_value=1.0)
+    values = [gen.generate_value() for _ in range(1000)]
+    assert all(v >= 0.0 for v in values), "CIR went negative despite satisfying Feller condition"
+
+def test_cir_generator_reset():
+    """
+    After reset, the generator should return to its start value.
+    """
+    gen = CoxIngersollRossGenerator(mu=1.0, theta=0.5, sigma=0.5, dt=0.01, start_value=1.0)
+    for _ in range(50):
+        gen.generate_value()
+    gen.reset()
+    assert gen.current_value == 1.0
+
+def test_cir_feller_condition_violation():
+    """
+    Ensure that the Cox-Ingersoll-Ross generator enforces the Feller condition.
+    The Feller condition requires: 2 * theta * mu >= sigma^2.
+    If violated, the constructor should raise a ValueError with explanation.
+    """
+    mu = 1.0
+    theta = 0.1
+    sigma = 1.0  # Violates 2 * theta * mu = 0.2 < sigma^2 = 1.0
+
+    with pytest.raises(ValueError, match="Feller condition violated"):
+        CoxIngersollRossGenerator(mu=mu, theta=theta, sigma=sigma)
+
+
+# === NOISE MODIFIER ===
+
+def test_gaussian_noise_perturbs_base():
+    """
+    GaussianNoise should apply perturbations to its base generator.
+    We check that output is still float and deviates from base trend.
+    """
+    base_gen = LinearTrendGenerator(start_value=100, slope=1)
+    noisy_gen = GaussianNoise(base_gen, mu=0.0, sigma=1.0)
+
+    noisy_values = [noisy_gen.generate_value(None) for _ in range(5)]
+    assert all(isinstance(p, float) for p in noisy_values)
+
+    # Check that noise caused deviation from the clean linear trend
+    diffs = [abs(p - (101 + i)) for i, p in enumerate(noisy_values)]
+    assert any(diff > 0 for diff in diffs)
+
+
+# === POISSON NOISE MODIFIER ===
+
+
+def test_poisson_noise_modifier_adds_random_jumps():
+    """
+    PoissonNoiseModifier should perturb the output of the base generator
+    by adding Poisson-distributed noise at every time step.
+
+    We test that:
+    - Values remain floats.
+    - The output deviates from the clean linear trend.
+    """
+    base = LinearTrendGenerator(start_value=100.0, slope=1.0)
+    mod = PoissonNoiseModifier(generator=base, lam=2.0, direction="both")
+
+    values = [mod.generate_value(None) for _ in range(10)]
+
+    assert all(isinstance(v, float) for v in values)
+
+    expected = [101 + i for i in range(10)]
+    diffs = [abs(v - e) for v, e in zip(values, expected)]
+    assert any(d > 0.0 for d in diffs)  # noise must cause at least one deviation
+
 

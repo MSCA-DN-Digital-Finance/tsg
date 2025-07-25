@@ -6,7 +6,8 @@ from tsg.generators import (
     PeriodicTrendGenerator,
     RandomWalkGenerator,
     OrnsteinUhlenbeckGenerator,
-)
+    GeometricBrownianMotionGenerator)
+
 from tsg.modifiers import (
     GaussianNoise,
     PoissonNoiseModifier,
@@ -178,4 +179,42 @@ def test_compound_poisson_jump_modifier_injects_fixed_number_of_jumps():
     # Number of jumps injected equals number of jump steps
     assert jump_count == len(jump_steps)
     assert jump_count > 0  # Should have at least one jump
+
+
+def test_gbm_generator_produces_positive_values():
+    """
+    GeometricBrownianMotionGenerator should produce strictly positive values.
+    """
+    gen = GeometricBrownianMotionGenerator(
+        start_value=1.0, mu=0.05, sigma=0.1, dt=1.0
+    )
+    values = [gen.generate_value() for _ in range(100)]
+    assert all(v > 0 for v in values)
+
+def test_gbm_generator_with_zero_volatility_behaves_exponentially():
+    """
+    If sigma = 0, GBM should follow a deterministic exponential growth:
+    X_t = X_0 * exp(mu * t)
+    """
+    mu = 0.05
+    dt = 1.0
+    X0 = 1.0
+    gen = GeometricBrownianMotionGenerator(
+        start_value=X0, mu=mu, sigma=0.0, dt=dt
+    )
+    values = [gen.generate_value() for _ in range(5)]
+    expected = [X0 * np.exp(mu * (t+1)) for t in range(5)]
+    np.testing.assert_allclose(values, expected, rtol=1e-5)
+
+def test_gbm_generator_reset_works_properly():
+    """
+    After calling reset(), the GBM generator should restart from start_value.
+    """
+    gen = GeometricBrownianMotionGenerator(
+        start_value=2.0, mu=0.1, sigma=0.1, dt=1.0
+    )
+    for _ in range(10):
+        gen.generate_value()
+    gen.reset()
+    assert np.isclose(gen.current_value, 2.0)
 

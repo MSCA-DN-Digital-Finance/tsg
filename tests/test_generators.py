@@ -10,7 +10,7 @@ from tsg.generators import (
 from tsg.modifiers import (
     GaussianNoise,
     PoissonNoiseModifier,
-    SparsePoissonJumpModifier
+    CompoundPoissonJumpModifier
 )
 
 # === LINEAR TREND GENERATOR ===
@@ -145,23 +145,37 @@ def test_poisson_noise_modifier_adds_random_jumps():
     assert any(d > 0.0 for d in diffs)  # noise must cause at least one deviation
 
 
-def test_sparse_poisson_jump_modifier_injects_rare_jumps():
+def test_compound_poisson_jump_modifier_injects_fixed_number_of_jumps():
     """
-    SparsePoissonJumpModifier should inject discrete jumps at sparse intervals.
-    With lambda=5 over 100 steps, we expect roughly 5 jump events.
+    CompoundPoissonJumpModifier should inject a fixed number of jumps
+    (Poisson distributed) at randomly chosen time steps.
 
     We test that:
     - Values remain floats.
-    - At least one jump causes deviation from the base trend.
+    - Exactly N values deviate from the base trend, where N is the number of jumps.
     """
     T = 100
+    lam = 5
+    jump_size = 10.0
+
     base = LinearTrendGenerator(start_value=0.0, slope=1.0)
-    mod = SparsePoissonJumpModifier(generator=base, lam=5, T=T, jump_size=10.0, direction="both")
+    mod = CompoundPoissonJumpModifier(generator=base, lam=lam, T=T, jump_size=jump_size, direction="both")
+
+    # Save the actual jump times
+    jump_steps = mod.jump_times.copy()
 
     values = [mod.generate_value(None) for _ in range(T)]
+    expected = [1.0 + i for i in range(T)]
 
+    diffs = [abs(v - e) for v, e in zip(values, expected)]
+
+    # Count how many values differ from base trend by approximately jump_size
+    jump_count = sum(1 for d in diffs if abs(d) >= jump_size - 1e-5)
+
+    # Assert all values are floats
     assert all(isinstance(v, float) for v in values)
 
-    expected = [1 + i for i in range(T)]
-    diffs = [abs(v - e) for v, e in zip(values, expected)]
-    assert any(d > 0.0 for d in diffs)  # at least one jump should have occurred
+    # Number of jumps injected equals number of jump steps
+    assert jump_count == len(jump_steps)
+    assert jump_count > 0  # Should have at least one jump
+

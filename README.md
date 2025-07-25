@@ -57,15 +57,17 @@ print(values)
 
 ### Core Generators (`tsg.generators`)
 
-| Class                        | Description                                                             | Parameters                                 |
-|-----------------------------|-------------------------------------------------------------------------|--------------------------------------------|
-| `LinearTrendGenerator`      | Linearly increases or decreases the value at each step                  | `start_value`, `slope`                     |
-| `ConstantGenerator`         | Returns a fixed value (e.g., simulates cash)                            | None (uses `last_value` in `generate_value`) |
-| `PeriodicTrendGenerator`    | Generates a sinusoidal time series with set amplitude and frequency     | `start_value`, `amplitude`, `frequency`    |
-| `RandomWalkGenerator`       | Simulates Brownian motion: a drifting random walk with optional noise   | `start_value`, `mu`, `sigma`               |
-| `OrnsteinUhlenbeckGenerator`| Simulates mean-reverting noise with drift toward a long-term mean       | `mu`, `theta`, `sigma`, `dt`, `start_value`|
+| Class                         | Description                                                             | Parameters                                 |
+|------------------------------|-------------------------------------------------------------------------|--------------------------------------------|
+| `LinearTrendGenerator`       | Linearly increases or decreases the value at each step                  | `start_value`, `slope`                     |
+| `ConstantGenerator`          | Returns a fixed value (e.g., simulates cash)                            | None (uses `last_value` in `generate_value`) |
+| `PeriodicTrendGenerator`     | Generates a sinusoidal time series with set amplitude and frequency     | `start_value`, `amplitude`, `frequency`    |
+| `RandomWalkGenerator`        | Simulates Brownian motion: a drifting random walk with optional noise   | `start_value`, `mu`, `sigma`               |
+| `OrnsteinUhlenbeckGenerator` | Simulates mean-reverting noise with drift toward a long-term mean       | `mu`, `theta`, `sigma`, `dt`, `start_value`|
+| `GeometricBrownianMotionGenerator` | Simulates geometric Brownian motion for stock-like multiplicative noise | `start_value`, `mu`, `sigma`, `dt`        |
 
 ---
+
 
 ### Modifier Wrappers (`tsg.modifiers`)
 

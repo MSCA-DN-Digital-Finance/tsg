@@ -69,11 +69,18 @@ print(values)
 
 ### Modifier Wrappers (`tsg.modifiers`)
 
-| Class           | Description                                                  | Parameters              |
-|-----------------|--------------------------------------------------------------|--------------------------|
-| `GaussianNoise` | Adds Gaussian noise (`N(mu, sigma)`) to any base generator   | `mu`, `sigma`            |
+| Class                         | Description                                                                 | Parameters                              |
+|-------------------------------|-----------------------------------------------------------------------------|------------------------------------------|
+| `GaussianNoise`               | Adds Gaussian noise (`N(mu, sigma)`) to any base generator                 | `mu`, `sigma`                            |
+| `PoissonNoiseModifier`        | Adds Poisson-distributed noise to each step                                | `lam`, `direction`                       |
+| `CompoundPoissonJumpModifier`| Adds a fixed number of Poisson-sampled jumps to randomly chosen steps      | `lam`, `T`, `jump_size`, `direction`    |
 
----
+### Notes
+
+- `direction` can be `'positive'`, `'negative'`, or `'both'` for both jump modifiers.
+- `PoissonNoiseModifier` samples a new Poisson value at **every step**.
+- `CompoundPoissonJumpModifier` samples **N ∼ Poisson(λ)** at reset and applies exactly N jumps randomly across T steps.
+- All modifiers are compatible with any `BaseGenerator`.
 
 ### Meta-Generators (`tsg.meta_generators`)
 

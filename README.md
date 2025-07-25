@@ -64,9 +64,9 @@ print(values)
 | `PeriodicTrendGenerator`     | Generates a sinusoidal time series with set amplitude and frequency     | `start_value`, `amplitude`, `frequency`    |
 | `RandomWalkGenerator`        | Simulates Brownian motion: a drifting random walk with optional noise   | `start_value`, `mu`, `sigma`               |
 | `OrnsteinUhlenbeckGenerator` | Simulates mean-reverting noise with drift toward a long-term mean       | `mu`, `theta`, `sigma`, `dt`, `start_value`|
+| `CoxIngersollRossGenerator`  | Square-root mean-reverting process with non-negativity and Feller condition         | `mu`, `theta`, `sigma`, `dt`, `start_value`|
 | `GeometricBrownianMotionGenerator` | Simulates geometric Brownian motion for stock-like multiplicative noise | `start_value`, `mu`, `sigma`, `dt`        |
 
----
 
 
 ### Modifier Wrappers (`tsg.modifiers`)
@@ -75,7 +75,7 @@ print(values)
 |-------------------------------|-----------------------------------------------------------------------------|------------------------------------------|
 | `GaussianNoise`               | Adds Gaussian noise (`N(mu, sigma)`) to any base generator                 | `mu`, `sigma`                            |
 | `PoissonNoiseModifier`        | Adds Poisson-distributed noise to each step                                | `lam`, `direction`                       |
-| `CompoundPoissonJumpModifier`| Adds a fixed number of Poisson-sampled jumps to randomly chosen steps      | `lam`, `T`, `jump_size`, `direction`    |
+
 
 ### Notes
 

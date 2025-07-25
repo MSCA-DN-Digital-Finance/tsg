@@ -29,6 +29,7 @@ jobs:
       - name: Build release distributions
         run: |
           # NOTE: put your own distribution build steps here.
+          rm -rf dist/                      # clean old files
           python -m pip install build
           python -m build
 
@@ -51,7 +52,7 @@ jobs:
     environment:
       name: pypi
       # OPTIONAL: uncomment and update to include your PyPI project URL in the deployment status:
-      url: https:https://pypi.org/project/tsg-lib/
+      url: https://pypi.org/project/tsg-lib/
       #
       # ALTERNATIVE: if your GitHub Release name is the PyPI project version string
       # ALTERNATIVE: exactly, uncomment the following line instead:

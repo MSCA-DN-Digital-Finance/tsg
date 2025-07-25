@@ -7,7 +7,11 @@ from tsg.generators import (
     RandomWalkGenerator,
     OrnsteinUhlenbeckGenerator,
 )
-from tsg.modifiers import GaussianNoise
+from tsg.modifiers import (
+    GaussianNoise,
+    PoissonNoiseModifier,
+    SparsePoissonJumpModifier
+)
 
 # === LINEAR TREND GENERATOR ===
 
@@ -118,3 +122,46 @@ def test_gaussian_noise_perturbs_base():
     # Check that noise caused deviation from the clean linear trend
     diffs = [abs(p - (101 + i)) for i, p in enumerate(noisy_values)]
     assert any(diff > 0 for diff in diffs)
+
+
+def test_poisson_noise_modifier_adds_random_jumps():
+    """
+    PoissonNoiseModifier should perturb the output of the base generator
+    by adding Poisson-distributed noise at every time step.
+
+    We test that:
+    - Values remain floats.
+    - The output deviates from the clean linear trend.
+    """
+    base = LinearTrendGenerator(start_value=100.0, slope=1.0)
+    mod = PoissonNoiseModifier(generator=base, lam=2.0, direction="both")
+
+    values = [mod.generate_value(None) for _ in range(10)]
+
+    assert all(isinstance(v, float) for v in values)
+
+    expected = [101 + i for i in range(10)]
+    diffs = [abs(v - e) for v, e in zip(values, expected)]
+    assert any(d > 0.0 for d in diffs)  # noise must cause at least one deviation
+
+
+def test_sparse_poisson_jump_modifier_injects_rare_jumps():
+    """
+    SparsePoissonJumpModifier should inject discrete jumps at sparse intervals.
+    With lambda=5 over 100 steps, we expect roughly 5 jump events.
+
+    We test that:
+    - Values remain floats.
+    - At least one jump causes deviation from the base trend.
+    """
+    T = 100
+    base = LinearTrendGenerator(start_value=0.0, slope=1.0)
+    mod = SparsePoissonJumpModifier(generator=base, lam=5, T=T, jump_size=10.0, direction="both")
+
+    values = [mod.generate_value(None) for _ in range(T)]
+
+    assert all(isinstance(v, float) for v in values)
+
+    expected = [1 + i for i in range(T)]
+    diffs = [abs(v - e) for v, e in zip(values, expected)]
+    assert any(d > 0.0 for d in diffs)  # at least one jump should have occurred

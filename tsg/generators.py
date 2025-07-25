@@ -145,3 +145,33 @@ class RandomWalkGenerator(BaseGenerator):
         self.current_value = self.start_value
 
 
+class GeometricBrownianMotionGenerator(BaseGenerator):
+    def __init__(self, mu=0.1, sigma=0.3, dt=1.0, start_value=1.0):
+        """
+        Geometric Brownian Motion generator using log-normal updates.
+
+        Parameters:
+        - mu: drift coefficient
+        - sigma: volatility coefficient
+        - dt: time step size
+        - start_value: initial value
+        """
+        self.mu = mu
+        self.sigma = sigma
+        self.dt = dt
+        self.start_value = start_value
+        self.current_value = start_value
+
+    def generate_value(self, last_value=None):
+        if last_value is None:
+            last_value = self.current_value
+
+        z = np.random.normal()
+        factor = np.exp((self.mu - 0.5 * self.sigma**2) * self.dt + self.sigma * np.sqrt(self.dt) * z)
+        new_value = last_value * factor
+
+        self.current_value = new_value
+        return new_value
+
+    def reset(self):
+        self.current_value = self.start_value

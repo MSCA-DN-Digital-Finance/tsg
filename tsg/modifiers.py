@@ -51,16 +51,17 @@ class PoissonNoiseModifier(BaseGenerator):
         self.generator.reset()
 
 
-class SparsePoissonJumpModifier(BaseGenerator):
+class CompoundPoissonJumpModifier(BaseGenerator):
     def __init__(self, generator, lam=3, T=100, jump_size=1.0, direction='positive'):
         """
-        Adds rare Poissonian jumps (λ expected total events over T steps).
+        Adds jumps at randomly selected steps using a compound Poisson process.
+        A fixed number of Poisson-distributed events are assigned at random time steps.
 
         Parameters:
-        - generator: the base generator
-        - lam: expected number of jumps over T steps
-        - T: total number of simulation steps (used to compute per-step prob)
-        - jump_size: fixed magnitude of each jump (default 1.0)
+        - generator: base generator to wrap
+        - lam: expected number of jumps over T steps (λ)
+        - T: total number of steps (must be set at init)
+        - jump_size: fixed magnitude of each jump
         - direction: 'positive', 'negative', or 'both'
         """
         assert direction in {'positive', 'negative', 'both'}, "Invalid direction"
@@ -70,19 +71,31 @@ class SparsePoissonJumpModifier(BaseGenerator):
         self.jump_size = jump_size
         self.direction = direction
 
+        self.reset()
+
+    def reset(self):
+        self.generator.reset()
+        # Sample number of jumps: N ~ Poisson(λ)
+        self.jump_times = set(np.random.choice(
+            self.T,
+            size=np.random.poisson(self.lam),
+            replace=False
+        )) if self.lam > 0 else set()
+        self.t = 0  # internal time counter
+
     def generate_value(self, last_value):
         base = self.generator.generate_value(last_value)
-        prob = self.lam / self.T
-        if np.random.rand() < prob:
+
+        if self.t in self.jump_times:
             if self.direction == 'positive':
                 jump = self.jump_size
             elif self.direction == 'negative':
                 jump = -self.jump_size
-            elif self.direction == 'both':
+            else:  # 'both'
                 jump = np.random.choice([-1, 1]) * self.jump_size
-            return base + jump
         else:
-            return base
+            jump = 0.0
 
-    def reset(self):
-        self.generator.reset()
+        self.t += 1
+        return base + jump
+

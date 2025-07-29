@@ -20,7 +20,7 @@ class GaussianNoise(BaseGenerator):
         self.generator.reset()
 
 
-class PoissonNoiseModifier(BaseGenerator):
+class PoissonNoise(BaseGenerator):
     def __init__(self, generator, lam=1.0, direction='positive'):
         """
         Adds Poisson-distributed noise at each time step.

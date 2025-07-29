@@ -11,8 +11,7 @@ from tsg.generators import (
 
 from tsg.modifiers import (
     GaussianNoise,
-    PoissonNoiseModifier,
-    CompoundPoissonJumpModifier
+    PoissonNoise
 )
 
 # === LINEAR TREND GENERATOR ===
@@ -183,7 +182,7 @@ def test_cir_feller_condition_violation():
         CoxIngersollRossGenerator(mu=mu, theta=theta, sigma=sigma)
 
 
-# === NOISE MODIFIER ===
+# === GAUSSIAN NOISE MODIFIER ===
 
 def test_gaussian_noise_perturbs_base():
     """
@@ -214,7 +213,7 @@ def test_poisson_noise_modifier_adds_random_jumps():
     - The output deviates from the clean linear trend.
     """
     base = LinearTrendGenerator(start_value=100.0, slope=1.0)
-    mod = PoissonNoiseModifier(generator=base, lam=2.0, direction="both")
+    mod = PoissonNoise(generator=base, lam=2.0, direction="both")
 
     values = [mod.generate_value(None) for _ in range(10)]
 

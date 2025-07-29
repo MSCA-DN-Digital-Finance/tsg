@@ -57,23 +57,32 @@ print(values)
 
 ### Core Generators (`tsg.generators`)
 
-| Class                        | Description                                                             | Parameters                                 |
-|-----------------------------|-------------------------------------------------------------------------|--------------------------------------------|
-| `LinearTrendGenerator`      | Linearly increases or decreases the value at each step                  | `start_value`, `slope`                     |
-| `ConstantGenerator`         | Returns a fixed value (e.g., simulates cash)                            | None (uses `last_value` in `generate_value`) |
-| `PeriodicTrendGenerator`    | Generates a sinusoidal time series with set amplitude and frequency     | `start_value`, `amplitude`, `frequency`    |
-| `RandomWalkGenerator`       | Simulates Brownian motion: a drifting random walk with optional noise   | `start_value`, `mu`, `sigma`               |
-| `OrnsteinUhlenbeckGenerator`| Simulates mean-reverting noise with drift toward a long-term mean       | `mu`, `theta`, `sigma`, `dt`, `start_value`|
+| Class                         | Description                                                             | Parameters                                 |
+|------------------------------|-------------------------------------------------------------------------|--------------------------------------------|
+| `LinearTrendGenerator`       | Linearly increases or decreases the value at each step                  | `start_value`, `slope`                     |
+| `ConstantGenerator`          | Returns a fixed value (e.g., simulates cash)                            | None (uses `last_value` in `generate_value`) |
+| `PeriodicTrendGenerator`     | Generates a sinusoidal time series with set amplitude and frequency     | `start_value`, `amplitude`, `frequency`    |
+| `RandomWalkGenerator`        | Simulates Brownian motion: a drifting random walk with optional noise   | `start_value`, `mu`, `sigma`               |
+| `OrnsteinUhlenbeckGenerator` | Simulates mean-reverting noise with drift toward a long-term mean       | `mu`, `theta`, `sigma`, `dt`, `start_value`|
+| `CoxIngersollRossGenerator`  | Square-root mean-reverting process with non-negativity and Feller condition         | `mu`, `theta`, `sigma`, `dt`, `start_value`|
+| `GeometricBrownianMotionGenerator` | Simulates geometric Brownian motion for stock-like multiplicative noise | `start_value`, `mu`, `sigma`, `dt`        |
 
----
+
 
 ### Modifier Wrappers (`tsg.modifiers`)
 
-| Class           | Description                                                  | Parameters              |
-|-----------------|--------------------------------------------------------------|--------------------------|
-| `GaussianNoise` | Adds Gaussian noise (`N(mu, sigma)`) to any base generator   | `mu`, `sigma`            |
+| Class                         | Description                                                                 | Parameters                              |
+|-------------------------------|-----------------------------------------------------------------------------|------------------------------------------|
+| `GaussianNoise`               | Adds Gaussian noise (`N(mu, sigma)`) to any base generator                 | `mu`, `sigma`                            |
+| `PoissonNoiseModifier`        | Adds Poisson-distributed noise to each step                                | `lam`, `direction`                       |
 
----
+
+### Notes
+
+- `direction` can be `'positive'`, `'negative'`, or `'both'` for both jump modifiers.
+- `PoissonNoiseModifier` samples a new Poisson value at **every step**.
+- `CompoundPoissonJumpModifier` samples **N ∼ Poisson(λ)** at reset and applies exactly N jumps randomly across T steps.
+- All modifiers are compatible with any `BaseGenerator`.
 
 ### Meta-Generators (`tsg.meta_generators`)
 

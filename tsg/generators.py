@@ -145,3 +145,81 @@ class RandomWalkGenerator(BaseGenerator):
         self.current_value = self.start_value
 
 
+class GeometricBrownianMotionGenerator(BaseGenerator):
+    def __init__(self, mu=0.1, sigma=0.3, dt=1.0, start_value=1.0):
+        """
+        Geometric Brownian Motion generator using log-normal updates.
+
+        Parameters:
+        - mu: drift coefficient
+        - sigma: volatility coefficient
+        - dt: time step size
+        - start_value: initial value
+        """
+        self.mu = mu
+        self.sigma = sigma
+        self.dt = dt
+        self.start_value = start_value
+        self.current_value = start_value
+
+    def generate_value(self, last_value=None):
+        if last_value is None:
+            last_value = self.current_value
+
+        z = np.random.normal()
+        factor = np.exp((self.mu - 0.5 * self.sigma**2) * self.dt + self.sigma * np.sqrt(self.dt) * z)
+        new_value = last_value * factor
+
+        self.current_value = new_value
+        return new_value
+
+    def reset(self):
+        self.current_value = self.start_value
+
+class CoxIngersollRossGenerator(BaseGenerator):
+    def __init__(self, mu=1.0, theta=0.5, sigma=0.1, dt=0.1, start_value=1.0):
+        """
+        Simulates a CIR process: dX_t = θ(μ - X_t)dt + σ√X_t dW_t
+
+        Parameters:
+        - mu: long-term mean
+        - theta: speed of mean reversion
+        - sigma: volatility
+        - dt: time increment
+        - start_value: initial state (should be ≥ 0)
+        """
+        assert start_value >= 0, "CIR process must start at a non-negative value"
+
+        # Feller condition check
+        feller_lhs = 2 * theta * mu
+        feller_rhs = sigma ** 2
+        if feller_lhs < feller_rhs:
+            raise ValueError(
+                f"Feller condition violated: 2θμ = {feller_lhs:.4f} < σ² = {feller_rhs:.4f}. "
+                f"The Feller condition (2θμ ≥ σ²) ensures that the process stays strictly positive almost surely."
+                f"If this condition is violated, the process may hit zero."
+            )
+
+        self.mu = mu
+        self.theta = theta
+        self.sigma = sigma
+        self.dt = dt
+        self.start_value = start_value
+        self.current_value = start_value
+
+    def generate_value(self, last_value=None):
+        if last_value is None:
+            last_value = self.current_value
+
+        sqrt_term = np.sqrt(max(last_value, 0))
+        noise = np.random.normal()
+        new_value = (
+            last_value
+            + self.theta * (self.mu - last_value) * self.dt
+            + self.sigma * sqrt_term * np.sqrt(self.dt) * noise
+        )
+        self.current_value = max(new_value, 0.0)
+        return self.current_value
+
+    def reset(self):
+        self.current_value = self.start_value

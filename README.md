@@ -7,10 +7,13 @@ It is designed for research, simulation, and testing of sequential decision-maki
 
 ## 🚀 Features
 
-- 📈 Core generators: linear trend, periodic trend, constant value
-- 🎲 Noise wrappers: add Gaussian noise or build your own modifiers
-- 🔁 Stateful generators with `reset()` support
-- 🧱 Easy to extend with your own generator or modifier classes
+- 📈 Core generators: linear trend, periodic trend, constant value and more
+- 🎲 Noise wrappers: add Gaussian, Poisson, or custom noise with modular wrappers
+- 🧠 Metagenerators: combine or chain multiple generators to create complex dynamics
+- 🔁 Stateful generators: all support `.reset()` for reproducible experiments
+- 🧱 Easily extensible: plug in your own generators, wrappers, or agent environments
+
+
 
 ---
 
@@ -53,6 +56,14 @@ for _ in range(10):
 print(values)
 ```
 
+## 📚 Examples
+
+Explore the `examples/` folder for practical usage:
+
+- 🔮 **Forecasting Example**: Learn how to generate time series data and evaluate forecasting models using different generators and modifiers.  
+  → [https://github.com/MSCA-DN-Digital-Finance/tsg/blob/main/examples/250722_forecasting.ipynb](examples/250722_forecasting.ipynb)
+
+
 ## 🧠 API Overview
 
 ### Core Generators (`tsg.generators`)
@@ -74,14 +85,14 @@ print(values)
 | Class                         | Description                                                                 | Parameters                              |
 |-------------------------------|-----------------------------------------------------------------------------|------------------------------------------|
 | `GaussianNoise`               | Adds Gaussian noise (`N(mu, sigma)`) to any base generator                 | `mu`, `sigma`                            |
-| `PoissonNoiseModifier`        | Adds Poisson-distributed noise to each step                                | `lam`, `direction`                       |
+| `PoissonNoise`                | Adds Poisson-distributed noise to each step                                | `lam`, `direction`                       |
 
 
 ### Notes
 
-- `direction` can be `'positive'`, `'negative'`, or `'both'` for both jump modifiers.
+- `direction` parameter can be `'positive'`, `'negative'`, or `'both'`.
 - `PoissonNoiseModifier` samples a new Poisson value at **every step**.
-- `CompoundPoissonJumpModifier` samples **N ∼ Poisson(λ)** at reset and applies exactly N jumps randomly across T steps.
+
 - All modifiers are compatible with any `BaseGenerator`.
 
 ### Meta-Generators (`tsg.meta_generators`)

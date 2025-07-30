@@ -1,7 +1,7 @@
 # tsg – Modular Time Series Generator Library
 
 **tsg** is a lightweight Python library for generating synthetic time series data using modular and composable generators.  
-It is designed for research, simulation, and testing of sequential decision-making algorithms, especially in finance and machine learning.
+It is designed for research, simulation, and testing of temporal models, especially in finance and machine learning.
 
 ---
 
@@ -26,7 +26,7 @@ Install through GitHub from any location:
 pip install git+https://github.com/MSCA-DN-Digital-Finance/tsg.git
 ```
 
-Install through PyPi from any location:
+Install through PyPI from any location:
 
 ```bash
 pip install tsg-lib
